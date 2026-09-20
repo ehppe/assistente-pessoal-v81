@@ -1,0 +1,24 @@
+NEYMAR 73 — CORREÇÕES DA CENTRAL
+
+- Comunicação entre motor e Qt explicitamente em UTF-8 nos dois processos,
+  corrigindo a interpretação dos acentos no Windows.
+- Removida a zona térmica ACPI como fonte de temperatura de CPU.
+  A leitura continua tentando sensores CPU Libre/Open Hardware Monitor
+  e depois GPU NVIDIA, sempre identificando a fonte disponível.
+- Pedidos comuns de agendamento pessoal são interceptados antes da IA.
+  O programa informa que não foram agendados. Esta versão não adiciona uma
+  agenda de compromissos pessoais; os avisos confirmados de jogos continuam.
+- Textos antigos já corrompidos no histórico não são reescritos.
+- 141 testes de lógica passaram. Teste de Windows real depende do seu PC.
+
+COMO ATUALIZAR
+Feche o Neymar pela bandeja e faça backup.
+Copie os arquivos do pacote para a mesma pasta da v72.
+Preserve config.json, dados, modelos e .venv.
+Abra Iniciar Assistente.bat. Não precisa reinstalar PySide6.
+
+TESTES NO SEU PC
+Digite: Explique o que é memória RAM em português.
+Digite: Me lembre amanhã do almoço.
+A segunda solicitação deve informar que NÃO foi agendada.
+Confira a origem da temperatura: ACPI não deve mais aparecer.

@@ -1,0 +1,22 @@
+# Dados pessoais e credenciais locais
+config.json
+dados/
+.env
+.env.*
+*.dpapi
+*.pem
+*.key
+# Ambiente, modelos e áudio
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+modelos/
+models/
+vozes/
+*.onnx
+*.wav
+*.mp3
+*.log
+*.prof
+*.zip

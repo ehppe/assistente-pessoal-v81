@@ -1,0 +1,36 @@
+NEYMAR 74 — CONFIGURAÇÕES E MODO DE JOGO EM QT
+
+ATUALIZAR
+Feche o Neymar pela bandeja. Faça backup da pasta atual.
+Copie os arquivos deste pacote para a pasta em que a v73 funciona.
+Preserve config.json, dados, modelos e .venv.
+Abra Iniciar Assistente.bat. Não é necessário reinstalar PySide6.
+
+CONFIGURAÇÕES
+Agora o botão superior abre as abas Inteligência, Voz, Microfone e Sistema.
+Salvar permanece no rodapé, com rolagem no formulário.
+Campos de chave vazios preservam as credenciais existentes.
+Novas chaves continuam protegidas por DPAPI; as salvas não são exibidas.
+Após alterar microfone, reconhecimento ou ativação, reinicie o Neymar.
+Testar voz salva utiliza as preferências já gravadas.
+Opções avançadas abre a janela anterior para consulta de modelos, teste
+de conexão, remoção de chaves, voz específica do Windows e canais Discord.
+
+MODO DE JOGO
+O botão superior abre a seleção no mesmo visual da central.
+Salvar apenas grava. Salvar e ativar mostra uma confirmação dos programas
+selecionados antes de executar pela fila normal de comandos.
+Steam, Discord, jogos e serviços Windows não podem ser adicionados à lista.
+O plano Alto desempenho é opcional; o motor existente restaura o anterior
+ao sair quando aplicável. Aplicativos fechados não são reabertos.
+Os comandos de voz de modo de jogo mantêm o comportamento anterior.
+
+VALIDAÇÃO
+147 testes automatizados aprovados.
+Configurações e Modo de jogo renderizados em Qt offscreen no Linux.
+Sensores, áudio, DPAPI e fechamento de aplicativos precisam do teste real
+no Windows. Nenhum programa do seu computador foi fechado durante a criação.
+
+PRÓXIMAS ETAPAS
+Agenda pessoal real, temperaturas separadas com gráficos e ondas por volume
+ainda não foram implementadas nesta versão.

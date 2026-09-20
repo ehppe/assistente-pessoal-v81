@@ -1,0 +1,35 @@
+NEYMAR 72 — CENTRAL QT / ETAPA 1
+
+INSTALAÇÃO
+1. Feche o Neymar pelo ícone perto do relógio e faça backup da pasta atual.
+2. Copie os arquivos deste pacote para a pasta em que o Neymar já funciona.
+   Preserve config.json, dados, modelos e .venv.
+3. Execute "8 - Instalar nova interface.bat". Precisa de internet para baixar
+   PySide6. Não requer chave de API ou assinatura para a interface.
+4. Abra "Iniciar Assistente.bat".
+   Para instalação do zero, execute primeiro "1 - Instalar Assistente.bat".
+
+NOVO VISUAL
+- Central Qt Quick/QML: fundo escuro, esfera com órbitas e ondas animadas.
+- Navegação superior, conversa, digitação e controles de voz.
+- Indicadores locais da v71, inclusive origem da temperatura (CPU OU GPU).
+- Animação reage ao estado de fala, ainda não ao volume exato do áudio.
+- Modo de jogo congela a animação; minimizada não desenha nem inicia sensores.
+- Fechar a janela mantém o assistente na bandeja; abra por ela novamente.
+- Esc interrompe a voz. Confirmações usam os tokens do motor existente.
+- Dados passam somente por pipes privados entre processos locais.
+- Nenhuma chave de API é enviada à nova interface.
+
+COMPATIBILIDADE
+Configurações e modo de jogo ainda abrem as janelas clássicas nesta etapa.
+A revisão de transcrição também abre a conversa clássica para edição.
+Se PySide6 não estiver instalado, a interface clássica abre normalmente.
+Se a nova interface falhar, consulte dados/interface-qt.log.
+"Iniciar interface classica.bat" força a tela anterior: feche o Neymar antes.
+
+TESTES
+138 testes automatizados de lógica aprovados.
+QML carregado e renderizado no ambiente Linux em modo offscreen.
+Sensores, áudio, drivers gráficos e integração completa no Windows ainda
+precisam ser conferidos no seu computador.
+Não substitui o Gemini nem altera o modelo salvo na sua configuração.

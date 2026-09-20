@@ -1,0 +1,1 @@
+v65: 127 testes passaram em Linux; 7 novos cobrem Gemini. Rede e Windows simulados, sem chave real. Teste real pendente.
