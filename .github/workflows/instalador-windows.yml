@@ -1,0 +1,45 @@
+name: Gerar instalador do Windows
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  instalador:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+      - name: Preparar Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-installer.txt
+      - name: Instalar Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Gerar instalador único
+        shell: powershell
+        run: .\build_installer.ps1
+      - name: Testar existência e hash
+        shell: powershell
+        run: |
+          if (!(Test-Path dist\Neymar-Setup-v81.exe)) { throw 'Instalador não foi criado.' }
+          Get-FileHash dist\Neymar-Setup-v81.exe -Algorithm SHA256
+      - name: Guardar instalador no GitHub Actions
+        uses: actions/upload-artifact@v4
+        with:
+          name: Neymar-Setup-v81
+          path: dist/Neymar-Setup-v81.exe
+          if-no-files-found: error
+      - name: Anexar à Release da tag
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/Neymar-Setup-v81.exe
