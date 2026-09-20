@@ -48,7 +48,11 @@ SPOTIFY = ['Abrindo no Spotify.', 'Já busquei no Spotify.', 'Tocando no Spotify
 HORA = ['Agora são {h}.', 'São {h} agora.', 'O relógio marca {h}.']
 
 OUVINDO = ['Estou ouvindo...', 'Pode falar.', 'Diga o que precisa.', 'Sou todo ouvidos.']
-CONTINUAR = ['Pode continuar...', 'Mais alguma coisa?', 'Estou por aqui, se precisar de mais algo.']
+CONTINUAR = [
+    'Precisa de mais alguma coisa?',
+    'Quer pedir mais alguma coisa?',
+    'Posso ajudar com algo mais?',
+]
 
 NAO_ENTENDI = [
     'Não entendi. Pode pedir de outra forma?',

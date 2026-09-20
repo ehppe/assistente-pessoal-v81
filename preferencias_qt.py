@@ -22,6 +22,7 @@ CAMPOS=[
  ('Voz','ritmo_piper','Ritmo Piper · 0.8 a 1.3',[]),
  ('Voz','velocidade_voz','Velocidade Windows · 100 a 250',[]),
  ('Voz','responder_por_voz','Falar respostas','bool'),
+ ('Voz','perguntar_apos_resposta','Perguntar se preciso de algo mais','bool'),
  ('Microfone','reconhecimento','Reconhecimento',['whisper','vosk','groq']),
  ('Microfone','perfil_whisper','Perfil Whisper',['precisao','rapido']),
  ('Microfone','microfone','Dispositivo de entrada',[]),

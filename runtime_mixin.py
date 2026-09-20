@@ -95,6 +95,29 @@ class RuntimeMixin:
         self.parar_fala()
         self.ui(0,lambda:self.mostrar('Cancelado. Ações já executadas não são desfeitas.'))
 
+    def deve_perguntar_continuacao(self, comando, geracao):
+        if (not self.config.get('perguntar_apos_resposta',True)
+                or not self.config.get('responder_por_voz',True)
+                or geracao!=self.geracao or self.encerrar.is_set()
+                or self.pausado.is_set() or self.acao_pendente
+                or self.agenda.proposta() or not self.fila_comandos.empty()):
+            return False
+        import re
+        n=re.sub(r'[^a-z0-9\s]',' ',preparar_pedido(comando))
+        n=re.sub(r'\s+',' ',n).strip()
+        encerramentos={
+            'nao','nao obrigado','nao obrigada','nada','nada mais','so isso',
+            'era so isso','obrigado','obrigada','valeu','pode parar',
+        }
+        return n not in encerramentos
+
+    def perguntar_continuacao(self, comando, geracao):
+        if not self.deve_perguntar_continuacao(comando,geracao):return False
+        import frases
+        self.aguardando_continuacao=True
+        self.falar(frases.variar(frases.CONTINUAR,self.config.get('tratamento','')),registrar=False)
+        return True
+
     def trabalhador(self):
         while not self.encerrar.is_set():
             try:c, geracao = self.fila_comandos.get(timeout=.25)
@@ -115,6 +138,9 @@ class RuntimeMixin:
                 self.executar(p)
                 while not self.voz_concluida.wait(.2):
                     if self.encerrar.is_set():return
+                if self.perguntar_continuacao(c,geracao):
+                    while not self.voz_concluida.wait(.2):
+                        if self.encerrar.is_set():return
             except Exception as e:
                 self.registrar('PEDIDO: '+type(e).__name__)
                 if geracao==self.geracao:

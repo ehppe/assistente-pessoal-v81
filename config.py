@@ -30,6 +30,7 @@ PADRAO = {
     "modelo_ollama": "qwen2.5:3b",
     "salvar_conversas": True,
     "responder_por_voz": True,
+    "perguntar_apos_resposta": True,
     "velocidade_voz": 172,
     "canal_modo_jogar": "",
     "palavras_ativacao": ["neymar"],

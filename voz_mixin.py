@@ -32,6 +32,14 @@ class VozMixin:
         elif time.time()<self.ativo_ate:
             self.ativo_ate=0;self.ui(0,lambda g=self.geracao:self.receber_transcricao(texto,g))
 
+    def pedir_repeticao(self):
+        if self.encerrar.is_set() or self.pausado.is_set():return
+        if self.acao_pendente or self.agenda.proposta():return
+        self.chamada_id+=1
+        self.ativo_ate=0
+        self.aguardando_repeticao=True
+        self.falar('Não entendi o que você quis dizer. Pode repetir?',registrar=False)
+
     def callback(self,dados,_f,_t,_status):
         amostras=array('h',bytes(dados))
         self.nivel_microfone=math.sqrt(sum(v*v for v in amostras)/max(1,len(amostras)))/32768
@@ -151,6 +159,7 @@ class VozMixin:
                         # A autorização foi verificada no resultado final antes de entregar o texto.
                         texto=re.sub(r'^neymar\b[ ,.:;!?-]*','',ouvido,flags=re.I).strip()
                         if texto:self.ui(0,lambda t=texto,g=geracao:self.receber_transcricao(t,g))
+                        else:self.ui(0,self.pedir_repeticao)
                     elif interessado:
                         if excedeu:
                             self.ui(0,lambda:self.mostrar('Pedido longo demais. Clique Ouvir pedido e fale em até 30 segundos.'))
@@ -170,7 +179,7 @@ class VozMixin:
                                     texto=re.sub(r'^\s*(?:neymar)\b[\s,.:;!?-]*','',texto,flags=re.I).strip()
                                     if texto:self.ui(0,lambda t=texto,g=geracao:self.receber_transcricao(t,g))
                                     elif ouvido and self.palavra_ativacao(norm(ouvido)):self.ui(0,self.ativar)
-                                    else:self.ui(0,lambda:self.mostrar('Não reconheci uma frase. Clique Ouvir pedido e tente novamente.'))
+                                    else:self.ui(0,self.pedir_repeticao)
                             except Exception as e:
                                 aviso=str(e) if isinstance(e,RuntimeError) else 'Reconhecimento falhou. Confira a instalação e o microfone.'
                                 self.registrar('TRANSCRIÇÃO: '+type(e).__name__)
@@ -221,11 +230,11 @@ class VozMixin:
         self.audio_processo,self.audio_respostas=processo,respostas
         return processo,respostas
 
-    def falar(self,t):
+    def falar(self,t,registrar=True):
         if self.encerrar.is_set():return
         if threading.current_thread().name=='NeymarComandos' and getattr(self,'job_geracao',self.geracao)!=self.geracao:return
         t=str(t)
-        self.registrar_resposta(t)
+        if registrar:self.registrar_resposta(t)
         self.estado_visual='speaking';self.ui(0,lambda:self.mostrar(t))
         self.voz_concluida.clear();self.falando.set()
         self.voz_fila.put((t,self.geracao,getattr(self,'epoca_voz',0)))
@@ -294,6 +303,12 @@ class VozMixin:
                     if self.acao_pendente:
                         self.estado_visual='confirm';self.ativo_ate=self.confirmacao_ate
                     elif geracao==self.geracao:
-                        segundos=20 if self.agenda.proposta() else self.config.get('segundos_conversa_continua',6)
+                        continuacao=bool(getattr(self,'aguardando_continuacao',False))
+                        repeticao=bool(getattr(self,'aguardando_repeticao',False))
+                        self.aguardando_continuacao=False
+                        self.aguardando_repeticao=False
+                        segundos=(20 if self.agenda.proposta() else
+                                  max(10,self.config.get('segundos_conversa_continua',0)) if (continuacao or repeticao) else
+                                  self.config.get('segundos_conversa_continua',0))
                         self.estado_visual='listening';self.ativo_ate=time.time()+segundos
                         self.ui(int(segundos*1000)+500,lambda i=self.chamada_id:self.ocultar_sem_comando(i))

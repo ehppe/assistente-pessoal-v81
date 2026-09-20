@@ -2,6 +2,10 @@
 
 ## 81
 
+- Opção para perguntar “Precisa de mais alguma coisa?” após cada resposta falada.
+- Nova escuta de continuação permite executar vários comandos em sequência sem repetir o nome.
+- Quando não entende a fala, pergunta novamente e reabre a escuta automaticamente.
+- A janela compacta pode ser ocultada ou reativada mesmo após uma falha de reconhecimento.
 - Nova Interface Compacta em QML, visualmente integrada à Central moderna.
 - Globo giroscópico compacto com órbitas, estrelas, onda reativa e cores por estado.
 - Nome configurável exibido por completo no centro da janela compacta.
