@@ -26,6 +26,10 @@ class Preferencias(TestCase):
         self.app.config['modelo_gemini']='gemini-3.5-flash-lite'
         self.assertEqual(validar(self.app,{'cidade_padrao':'Bauru'})['modelo_gemini'],'gemini-3.5-flash-lite')
 
+    def test_opcao_perguntar_apos_resposta(self):
+        self.assertTrue(validar(self.app,{'perguntar_apos_resposta':True})['perguntar_apos_resposta'])
+        with self.assertRaises(ValueError):validar(self.app,{'perguntar_apos_resposta':'sim'})
+
     def test_segredo_nao_vai_para_config(self):
         self.assertNotIn('chave_gemini',validar(self.app,{'chave_gemini':'segredo'}))
 

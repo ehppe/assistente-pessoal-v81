@@ -77,6 +77,23 @@ class TestNeymar(unittest.TestCase):
     def test_config_tipos(self):
         (self.base/'config.json').write_text('{"cor_nucleo":[],"palavras_ativacao":null,"discord_canais":[null]}')
         c=carregar(self.base);self.assertTrue(c['palavras_ativacao']);self.assertEqual(len(c['cor_nucleo']),3)
+    def test_pergunta_de_continuacao_e_encerramento(self):
+        h=Harness(self.base);h.config['responder_por_voz']=True;h.config['perguntar_apos_resposta']=True
+        try:
+            self.assertTrue(h.deve_perguntar_continuacao('abra o Chrome',h.geracao))
+            self.assertFalse(h.deve_perguntar_continuacao('não, obrigado',h.geracao))
+            h.falar=Mock()
+            self.assertTrue(h.perguntar_continuacao('abra o Chrome',h.geracao))
+            self.assertTrue(h.aguardando_continuacao);h.falar.assert_called_once()
+        finally:h.parar()
+    def test_falha_de_reconhecimento_pede_repeticao(self):
+        h=Harness(self.base);h.config['responder_por_voz']=True;h.falar=Mock()
+        try:
+            h.pedir_repeticao()
+            self.assertTrue(h.aguardando_repeticao)
+            self.assertEqual(h.chamada_id,1)
+            h.falar.assert_called_once_with('Não entendi o que você quis dizer. Pode repetir?',registrar=False)
+        finally:h.parar()
     def test_roteamento_discord(self):
         h=Harness(self.base)
         h.config['discord_canais']=[{'apelidos':['equipe','comp1'],'servidor_id':'123','canal_id':'456','canal_nome':'teste'}]
