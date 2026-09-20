@@ -16,6 +16,7 @@ class CentralBridge:
         self.sensor_em_andamento=False
         self.proximo_sensor=0
         self.visivel=True
+        self.compacto_visivel=False
         self.preferencias={}
         self.jogo_opcoes={}
         self.aviso=""
@@ -72,6 +73,15 @@ class CentralBridge:
         self.visivel=True
         self.mostrar_pendente=True
 
+    def mostrar_compacto(self):
+        self.compacto_visivel=True
+        self.mostrar_compacto_pendente=True
+
+    def ocultar_compacto(self):
+        self.compacto_visivel=False
+        self.mostrar_compacto_pendente=False
+        self.ocultar_compacto_pendente=True
+
     def sensores(self):
         from util import leitura_sistema
         try:self.sensor=leitura_sistema()
@@ -93,7 +103,7 @@ class CentralBridge:
         a=self.app
         acao=e.get('acao')
         if acao=='pronto':
-            self.pronto=True;self.carregar_preferencias()
+            self.pronto=True;self.carregar_preferencias();a.usar_qml_compacto=True;a.root.withdraw()
         elif acao in ('salvar_config','salvar_jogo','ativar_jogo'):
             from preferencias_qt import gravar,gravar_jogo
             try:
@@ -113,6 +123,8 @@ class CentralBridge:
                 a.falar('Olá'+((', '+nome) if nome else '')+'. Neymar à disposição.')
 
         elif acao=='visivel':self.visivel=bool(e.get('valor'))
+        elif acao=='compacto_visivel':self.compacto_visivel=bool(e.get('valor'))
+        elif acao=='mostrar_central':a.abrir_conversa()
         elif acao=='ouvir':a.ativar()
         elif acao=='parar':a.parar_fala()
         elif acao=='cancelar':a.cancelar_tudo()
@@ -155,7 +167,9 @@ class CentralBridge:
         if self.visivel and not self.sensor_em_andamento and agora>=self.proximo_sensor:
             self.proximo_sensor=agora+8;self.sensor_em_andamento=True
             threading.Thread(target=self.sensores,daemon=True).start()
-        if self.visivel:
+        if (self.visivel or self.compacto_visivel
+                or getattr(self,'mostrar_compacto_pendente',False)
+                or getattr(self,'ocultar_compacto_pendente',False)):
             from util import nivel_reativo
             estado=('Pausado' if a.pausado.is_set() else 'Ouvindo' if a.ativo_ate>time.time()
                     else 'Transcrevendo' if a.transcrevendo.is_set() else 'Falando' if not a.voz_concluida.is_set()
@@ -170,7 +184,11 @@ class CentralBridge:
                 'historico':a.historico_comandos[-40:],'sensor':self.sensor,
                 'proposta':proposta or {},'energia':bool(pendente),'tokenEnergia':token,
                 'status':a.ultimo_status[:220],
-                'mostrar':getattr(self,'mostrar_pendente',False)}
+                'mostrar':getattr(self,'mostrar_pendente',False),
+                'mostrarCompacto':getattr(self,'mostrar_compacto_pendente',False),
+                'ocultarCompacto':getattr(self,'ocultar_compacto_pendente',False)}
             self.mostrar_pendente=False
+            self.mostrar_compacto_pendente=False
+            self.ocultar_compacto_pendente=False
             self.enviar(dados)
         a.ui(300,self.pulso)

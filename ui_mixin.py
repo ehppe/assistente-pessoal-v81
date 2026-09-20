@@ -36,24 +36,49 @@ QUADROS_POR_ESTADO = 24
 
 class UIMixin:
     def interface(self):
-        self.frames_holograma = self.criar_frames_holograma(220)
+        # A janela pequena segue a mesma identidade da Central QML: globo
+        # amplo, linha de horizonte, nome no centro e estado na base.
+        self.root.geometry('320x338+30+30')
+        self.frames_holograma = self.criar_frames_holograma(250, mostrar_nucleo=False)
         self.frames_holograma_grande = self.criar_frames_holograma(120)
         self.img = self.frames_holograma['idle'][0]
         self.img_grande = self.frames_holograma_grande['idle'][0]
         self.robo = tk.Label(self.root, image=self.img, bg=TRANSP, bd=0)
-        self.robo.pack(pady=(8, 0))
-        self.status = tk.Label(
-            self.root, text='', bg='#172133', fg='#72d7ff',
-            font=('Segoe UI Semibold', 10), wraplength=255, padx=12, pady=8,
+        self.robo.place(x=35, y=15, width=250, height=250)
+
+        self.linha_horizonte = tk.Frame(self.root, bg='#49d7ff', bd=0)
+        self.linha_horizonte.place(x=9, y=138, width=302, height=1)
+
+        nome = str(self.config.get('nome_assistente', 'Neymar')).strip() or 'Neymar'
+        nome_exibido = ' '.join(nome.upper()) if len(nome) <= 12 else nome.upper()
+        tamanho_nome = 22 if len(nome_exibido) <= 15 else 17 if len(nome_exibido) <= 22 else 14
+        self.nome_compacto = tk.Label(
+            self.root, text=nome_exibido, bg=TRANSP, fg='#e8fbff',
+            font=('Segoe UI Semibold', tamanho_nome), bd=0,
         )
-        self.status.pack()
-        for w in (self.root, self.robo, self.status):
+        self.nome_compacto.place(x=20, y=114, width=280, height=46)
+        self.subtitulo_compacto = tk.Label(
+            self.root, text='S E U   A S S I S T E N T E   P E S S O A L',
+            bg=TRANSP, fg='#5da8c4', font=('Segoe UI', 7), bd=0,
+        )
+        self.subtitulo_compacto.place(x=34, y=158, width=252, height=18)
+
+        self.status = tk.Label(
+            self.root, text='', bg='#07162b', fg='#72d7ff',
+            font=('Segoe UI Semibold', 10), wraplength=270, padx=14, pady=8,
+            highlightthickness=1, highlightbackground='#153958',
+        )
+        self.status.place(x=17, y=276, width=286, height=48)
+        for w in (
+            self.root, self.robo, self.linha_horizonte, self.nome_compacto,
+            self.subtitulo_compacto, self.status,
+        ):
             w.bind('<Button-1>', self.inicio_arrasto)
             w.bind('<B1-Motion>', self.arrastar)
             w.bind('<Double-Button-1>', lambda _e: self.ativar())
         self.ui(90, self.animar_robo)
 
-    def criar_frames_holograma(self, tamanho=220):
+    def criar_frames_holograma(self, tamanho=220, mostrar_nucleo=True):
         # A cor base vem do config.json ("cor_nucleo"); cada estado usa uma
         # variação dela, exceto os estados com cor própria (pensando, etc).
         # Chamado duas vezes: um jogo de quadros pequeno (bandeja/widget) e
@@ -70,7 +95,10 @@ class UIMixin:
             for i in range(QUADROS_POR_ESTADO):
                 pulso = (1 + math.sin(i * math.pi / (QUADROS_POR_ESTADO / 2))) / 2
                 angulo = (360 / QUADROS_POR_ESTADO) * i * velocidade
-                quadro = gerar_nucleo(tamanho, cor, angulo=angulo, pulso=pulso)
+                quadro = gerar_nucleo(
+                    tamanho, cor, angulo=angulo, pulso=pulso,
+                    mostrar_nucleo=mostrar_nucleo,
+                )
                 frames[estado].append(ImageTk.PhotoImage(quadro))
         return frames
 
@@ -96,7 +124,9 @@ class UIMixin:
             angulo = (360 / QUADROS_POR_ESTADO) * self.quadro_animacao * velocidade
             cor = self.cores_holograma.get(estado, (64, 207, 255))
             pulso = nivel_reativo(getattr(self, 'nivel_microfone', 0))
-            self.img = ImageTk.PhotoImage(gerar_nucleo(220, cor, angulo=angulo, pulso=pulso))
+            self.img = ImageTk.PhotoImage(gerar_nucleo(
+                250, cor, angulo=angulo, pulso=pulso, mostrar_nucleo=False,
+            ))
             self.img_grande = ImageTk.PhotoImage(gerar_nucleo(120, cor, angulo=angulo, pulso=pulso))
         else:
             self.img = self.frames_holograma[estado][self.quadro_animacao]
@@ -109,7 +139,7 @@ class UIMixin:
             holo.config(image=self.img_grande)
         velocidade = 1.7 if estado in ('listening', 'thinking', 'speaking') else 1
         onda = math.sin(self.quadro_animacao * math.pi / 6 * velocidade)
-        self.robo.pack_configure(pady=(8 + round(onda * 4), 0))
+        self.robo.place_configure(y=15 + round(onda * 3))
         cores = {
             'idle': '#72d7ff', 'listening': '#40eaff', 'thinking': '#bd7cff',
             'speaking': '#45ffae', 'confirm': '#ffb347', 'pausado': '#8f97a3',
@@ -162,6 +192,9 @@ class UIMixin:
             self.ui(0, lambda:self.mostrar(texto));return
         self.ultimo_status = texto
         self.status.config(text=texto[:220])
+        central=getattr(self,'central_qt',None)
+        if getattr(self,'usar_qml_compacto',False) and central and not central.fechado:
+            central.mostrar_compacto();return
         self.root.deiconify()
         self.root.lift()
         self.reforcar_topo()
@@ -170,6 +203,10 @@ class UIMixin:
         if self.pausado.is_set() or self.acao_pendente:
             return
         self.status.config(text='Ouvindo: ' + texto)
+        central=getattr(self,'central_qt',None)
+        if getattr(self,'usar_qml_compacto',False) and central and not central.fechado:
+            self.ultimo_status='Ouvindo: '+texto
+            central.mostrar_compacto();return
         self.root.deiconify()
         self.root.lift()
 
@@ -278,4 +315,7 @@ class UIMixin:
             return
         self.ativo_ate = 0
         self.estado_visual = 'idle'
+        central=getattr(self,'central_qt',None)
+        if getattr(self,'usar_qml_compacto',False) and central and not central.fechado:
+            central.ocultar_compacto();return
         self.root.withdraw()

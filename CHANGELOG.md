@@ -2,6 +2,10 @@
 
 ## 81
 
+- Nova Interface Compacta em QML, visualmente integrada à Central moderna.
+- Globo giroscópico compacto com órbitas, estrelas, onda reativa e cores por estado.
+- Nome configurável exibido por completo no centro da janela compacta.
+- Atalhos na janela compacta para ouvir, ocultar e abrir a Central completa.
 - Nome do assistente configurável sem editar código.
 - Comando de voz/texto para trocar o nome, com reinicialização segura.
 - Palavra de ativação acompanha o nome escolhido.

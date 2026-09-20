@@ -313,7 +313,7 @@ def _meridiano(tamanho, raio, cor, fase_graus, largura, alpha=160):
     return camada
 
 
-def gerar_nucleo(tamanho=220, cor=(64, 207, 255), angulo=0.0, pulso=0.5):
+def gerar_nucleo(tamanho=220, cor=(64, 207, 255), angulo=0.0, pulso=0.5, mostrar_nucleo=True):
     """Desenha um quadro do núcleo holográfico como um globo giroscópico em
     pseudo-3D (linhas de latitude e longitude girando em torno de um núcleo
     brilhante, com poeira de estrelas ao redor) — no estilo de um HUD de IA
@@ -357,19 +357,20 @@ def gerar_nucleo(tamanho=220, cor=(64, 207, 255), angulo=0.0, pulso=0.5):
         camada = _meridiano(tamanho, raio, cor, fase, largura_linha)
         img.alpha_composite(camada)
 
-    # Núcleo brilhante no centro: várias camadas concêntricas simulam
-    # sombreado, mais um brilho especular deslocado, como um reator de vidro.
-    nucleo_raio = tamanho * (0.085 + pulso * 0.025)
-    passos = 12
-    for i in range(passos, 0, -1):
-        fator = i / passos
-        r = nucleo_raio * fator
-        alpha = int(80 + 175 * (1 - fator) ** 0.6)
-        d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=cor + (alpha,))
-    raio_brilho = nucleo_raio * 0.32
-    bx, by = cx - nucleo_raio * 0.35, cy - nucleo_raio * 0.4
-    cor_brilho = tuple(min(255, int(c * .5 + 255 * .5)) for c in cor)
-    d.ellipse((bx - raio_brilho, by - raio_brilho, bx + raio_brilho, by + raio_brilho), fill=cor_brilho + (150,))
+    if mostrar_nucleo:
+        # Núcleo brilhante usado nos ícones. A interface compacta o desativa
+        # para reservar o centro do globo ao nome configurável do assistente.
+        nucleo_raio = tamanho * (0.085 + pulso * 0.025)
+        passos = 12
+        for i in range(passos, 0, -1):
+            fator = i / passos
+            r = nucleo_raio * fator
+            alpha = int(80 + 175 * (1 - fator) ** 0.6)
+            d.ellipse((cx - r, cy - r, cx + r, cy + r), fill=cor + (alpha,))
+        raio_brilho = nucleo_raio * 0.32
+        bx, by = cx - nucleo_raio * 0.35, cy - nucleo_raio * 0.4
+        cor_brilho = tuple(min(255, int(c * .5 + 255 * .5)) for c in cor)
+        d.ellipse((bx - raio_brilho, by - raio_brilho, bx + raio_brilho, by + raio_brilho), fill=cor_brilho + (150,))
 
     return img
 

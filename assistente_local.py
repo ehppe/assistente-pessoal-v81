@@ -45,7 +45,7 @@ class Assistente(JogoMixin, RuntimeMixin, ConversaMixin, UIMixin, VozMixin, Acoe
         self.root.attributes('-topmost', True)
         self.root.configure(bg=TRANSP)
         self.root.wm_attributes('-transparentcolor', TRANSP)
-        self.root.geometry('290x350+30+30')
+        self.root.geometry('320x338+30+30')
         self.root.withdraw()
 
         self.audio = queue.Queue(maxsize=50)

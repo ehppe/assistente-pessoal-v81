@@ -13,6 +13,8 @@ class Ponte(QObject):
     recebido=Signal(str)
     changed=Signal()
     mostrar=Signal()
+    mostrarCompacto=Signal()
+    ocultarCompacto=Signal()
     def __init__(self):
         super().__init__()
         self._dados={'estado':'Conectando','sensor':{},'historico':[],'proposta':{},'energia':False,'jogo':False,'falando':False}
@@ -30,6 +32,8 @@ class Ponte(QObject):
             if dados!=self._dados:
                 self._dados=dados;self.changed.emit()
             if dados.get('mostrar'):self.mostrar.emit()
+            if dados.get('mostrarCompacto'):self.mostrarCompacto.emit()
+            if dados.get('ocultarCompacto'):self.ocultarCompacto.emit()
         except ValueError:pass
 
     @Slot(str,str)
@@ -56,6 +60,7 @@ def main():
     ponte=Ponte()
     engine.rootContext().setContextProperty('ponte',ponte)
     engine.load(QUrl.fromLocalFile(str(Path(__file__).parent/'interface_qt'/'Main.qml')))
+    engine.load(QUrl.fromLocalFile(str(Path(__file__).parent/'interface_qt'/'Compact.qml')))
     if not engine.rootObjects():return 2
     def ler():
         for linha in sys.stdin:
@@ -68,9 +73,17 @@ def main():
         def abrir_preview():
             QMetaObject.invokeMethod(engine.rootObjects()[0],'previewGame' if '--game-preview' in sys.argv else 'previewConfig')
         QTimer.singleShot(600,abrir_preview)
+    if '--compact-preview' in sys.argv:
+        def abrir_compacto():
+            raizes=engine.rootObjects()
+            if len(raizes)>1:
+                raizes[0].hide();raizes[1].show()
+        QTimer.singleShot(200,abrir_compacto)
     if '--captura' in sys.argv:
         def captura():
-            engine.rootObjects()[0].grabWindow().save(str(Path(__file__).parent/'preview-qt.png'))
+            raizes=engine.rootObjects()
+            indice=1 if '--compact-preview' in sys.argv and len(raizes)>1 else 0
+            raizes[indice].grabWindow().save(str(Path(__file__).parent/'preview-qt.png'))
             app.exit(0)
         QTimer.singleShot(1800,captura)
     return app.exec()
