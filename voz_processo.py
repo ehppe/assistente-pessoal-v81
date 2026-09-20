@@ -108,14 +108,19 @@ def main_persistente():
         saida.flush()
 
 
+def listar_vozes():
+    try:
+        import pyttsx3
+        motor=pyttsx3.init()
+        sys.stdout.buffer.write(json.dumps([{'id':v.id,'nome':v.name} for v in motor.getProperty('voices')],ensure_ascii=False).encode('utf-8'))
+        motor.stop()
+        return 0
+    except Exception as e:
+        sys.stdout.buffer.write(str(e).encode('utf-8'));sys.stdout.buffer.flush();return 1
+
+
 if __name__=='__main__':
     if '--listar' in sys.argv:
-        try:
-            import pyttsx3
-            motor=pyttsx3.init()
-            sys.stdout.buffer.write(json.dumps([{'id':v.id,'nome':v.name} for v in motor.getProperty('voices')],ensure_ascii=False).encode('utf-8'))
-            motor.stop()
-        except Exception as e:
-            sys.stdout.buffer.write(str(e).encode('utf-8'));sys.stdout.buffer.flush();sys.exit(1)
+        sys.exit(listar_vozes())
     else:
         main_persistente()

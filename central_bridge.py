@@ -6,6 +6,7 @@ import subprocess
 import sys
 import threading
 import time
+from pathlib import Path
 
 class CentralBridge:
     def __init__(self, app):
@@ -27,7 +28,10 @@ class CentralBridge:
         logdir=app.base/'dados';logdir.mkdir(exist_ok=True)
         self.log=open(logdir/'interface-qt.log','a',encoding='utf-8')
         try:
-            self.processo=subprocess.Popen([sys.executable,str(app.base/'central_qt.py')],
+            trabalhador=str(Path(sys.executable).with_name('NeymarWorker.exe'))
+            comando=([trabalhador,'--central-process'] if getattr(sys,'frozen',False)
+                     else [sys.executable,str(app.base/'central_qt.py')])
+            self.processo=subprocess.Popen(comando,
                 env=dict(os.environ,PYTHONIOENCODING="utf-8",PYTHONUTF8="1"),
                 stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=self.log,
                 text=True,encoding='utf-8',bufsize=1,

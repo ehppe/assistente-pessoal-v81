@@ -218,8 +218,11 @@ class VozMixin:
         if self.audio_processo is not None and self.audio_processo.poll() is None:
             return self.audio_processo, self.audio_respostas
         from pathlib import Path
-        python=Path(sys.executable).with_name('python.exe') if sys.platform=='win32' else Path(sys.executable)
-        args=[str(python),str(self.base/'voz_processo.py')]
+        if getattr(sys,'frozen',False):
+            args=[str(Path(sys.executable).with_name('NeymarWorker.exe')),'--voice-process']
+        else:
+            python=Path(sys.executable).with_name('python.exe') if sys.platform=='win32' else Path(sys.executable)
+            args=[str(python),str(self.base/'voz_processo.py')]
         processo=subprocess.Popen(args,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
         respostas=queue.Queue()
         def ler_respostas():

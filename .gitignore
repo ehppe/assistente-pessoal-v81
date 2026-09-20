@@ -8,7 +8,10 @@ dados/
 *.key
 # Ambiente, modelos e áudio
 .venv/
+.build-venv/
 venv/
+build/pyinstaller/
+dist/
 __pycache__/
 *.py[cod]
 modelos/

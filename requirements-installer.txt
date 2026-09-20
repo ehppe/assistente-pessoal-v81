@@ -1,0 +1,6 @@
+# Dependências usadas somente para gerar o instalador completo no Windows.
+-r requirements.txt
+-r requirements-interface.txt
+edge-tts>=7,<8
+av>=14,<17
+pyinstaller>=6.11,<7

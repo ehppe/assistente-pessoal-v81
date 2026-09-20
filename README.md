@@ -4,12 +4,20 @@ Assistente de voz com conversa local ou online, reconhecimento de voz, lembretes
 
 ## Instalação
 
+### Instalação recomendada
+
+Baixe `Neymar-Setup-v81.exe` na página de Releases, execute-o e siga as telas. O instalador único já inclui o programa, a interface e o reconhecimento básico; não exige Python nem comandos no PowerShell.
+
+### Instalação manual pelo ZIP
+
 1. Extraia todo o ZIP para uma pasta comum, fora de `Arquivos de Programas`.
 2. Execute `1 - Instalar Assistente.bat`.
 3. Preencha o perfil inicial.
 4. Execute `Iniciar Assistente.bat`.
 
 O instalador principal prepara Python, ambiente virtual, interface Qt, dependências, reconhecimento básico, IA local opcional e inicialização automática. Os instaladores numerados restantes servem para reparo ou componentes opcionais.
+
+As instruções para gerar o executável estão em `INSTALADOR-UNICO.md`.
 
 ## Privacidade
 
@@ -36,7 +44,7 @@ python -m compileall -q .
 python -m unittest discover -s tests -v
 ```
 
-A versão 81 contém 147 testes automatizados. Eles simulam rede, áudio e recursos do Windows; sensores, microfone, DPAPI, drivers e fechamento real de janelas ainda precisam ser validados no computador Windows.
+A versão 81 contém 156 testes automatizados. Eles simulam rede, áudio, empacotamento e recursos do Windows; sensores, microfone, DPAPI, drivers e fechamento real de janelas ainda precisam ser validados no computador Windows.
 
 ## Nome e agenda pessoal
 

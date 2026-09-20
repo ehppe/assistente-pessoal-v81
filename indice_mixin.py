@@ -15,6 +15,7 @@ import sqlite3
 import subprocess
 import threading
 import time
+import urllib.parse
 import webbrowser
 import winreg
 from ctypes import wintypes
@@ -241,7 +242,7 @@ class IndiceMixin:
     def abrir_app(self, t):
         n = norm(t)
         if not n:raise RuntimeError('Diga o nome do programa que deseja abrir.')
-        n = re.sub(r'\b(programa|aplicativo|app|jogo|game|da|do|na|no)\b', ' ', n)
+        n = re.sub(r'\b(programa|aplicativo|app|jogo|game|site|pagina|da|do|na|no)\b', ' ', n)
         n = re.sub(r'\s+', ' ', n).strip()
         mapa = {
             'chrome': ('https://google.com', 'Chrome'), 'google': ('https://google.com', 'Google Chrome'),
@@ -251,6 +252,35 @@ class IndiceMixin:
             'explorador': ('explorer.exe', 'Explorador de Arquivos'), 'steam': ('steam://open/main', 'Steam'),
             'stem': ('steam://open/main', 'Steam'),
         }
+        # Catálogo seguro de endereços oficiais. Não usa o primeiro resultado
+        # de uma busca, evitando abrir por engano anúncios ou páginas falsas.
+        sites = {
+            'netflix': ('https://www.netflix.com/br/', 'Netflix'),
+            'globo esporte': ('https://ge.globo.com/', 'Globo Esporte'),
+            'ge': ('https://ge.globo.com/', 'Globo Esporte'),
+            'globoplay': ('https://globoplay.globo.com/', 'Globoplay'),
+            'instagram': ('https://www.instagram.com/', 'Instagram'),
+            'facebook': ('https://www.facebook.com/', 'Facebook'),
+            'whatsapp web': ('https://web.whatsapp.com/', 'WhatsApp Web'),
+            'whatsapp': ('https://web.whatsapp.com/', 'WhatsApp Web'),
+            'gmail': ('https://mail.google.com/', 'Gmail'),
+            'outlook': ('https://outlook.live.com/mail/', 'Outlook'),
+            'twitch': ('https://www.twitch.tv/', 'Twitch'),
+            'prime video': ('https://www.primevideo.com/', 'Prime Video'),
+            'amazon prime': ('https://www.primevideo.com/', 'Prime Video'),
+            'disney plus': ('https://www.disneyplus.com/', 'Disney Plus'),
+            'hbo max': ('https://www.max.com/br/pt', 'Max'),
+            'max': ('https://www.max.com/br/pt', 'Max'),
+            'tiktok': ('https://www.tiktok.com/', 'TikTok'),
+            'twitter': ('https://x.com/', 'X'),
+            'mercado livre': ('https://www.mercadolivre.com.br/', 'Mercado Livre'),
+            'amazon': ('https://www.amazon.com.br/', 'Amazon'),
+        }
+        site = next((v for k, v in sites.items() if n == k or (len(k) > 3 and k in n)), None)
+        if site:
+            endereco, nome = site
+            webbrowser.open(endereco)
+            return nome
         item = next((v for k, v in mapa.items() if k in n), None)
         if item:
             d, nome = item
@@ -280,7 +310,11 @@ class IndiceMixin:
             rotulo, caminho = qualquer
             os.startfile(caminho)
             return rotulo
-        raise FileNotFoundError('Programa ou jogo não encontrado: ' + t)
+        # Se não for aplicativo, atalho, arquivo ou site conhecido, abre uma
+        # pesquisa pelo site oficial. Isso permite dizer “abra [nome]” sem
+        # cadastrar tudo e sem confiar automaticamente no primeiro resultado.
+        webbrowser.open('https://www.google.com/search?q=' + urllib.parse.quote_plus(n + ' site oficial'))
+        return 'pesquisa por ' + t
 
     def fechar_app(self, t):
         alvo = norm(t)

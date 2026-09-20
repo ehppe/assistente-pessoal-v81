@@ -8,8 +8,9 @@ from versao import TITULO
 
 BASE = Path(__file__).resolve().parent
 
-def main():
-    cfg=carregar(BASE)
+def main(base=None):
+    base=Path(base) if base is not None else BASE
+    cfg=carregar(base)
     root=tk.Tk();root.title(TITULO+' — Primeira configuração');root.geometry('560x500');root.resizable(False,False)
     corpo=ttk.Frame(root,padding=28);corpo.pack(fill='both',expand=True)
     ttk.Label(corpo,text='Bem-vindo ao '+TITULO,font=('Segoe UI',18,'bold')).pack(anchor='w')
@@ -28,7 +29,7 @@ def main():
         for chave,var in valores.items():cfg[chave]=var.get().strip()[:80]
         nome=cfg.get('nome_assistente') or 'Neymar';cfg['nome_assistente']=nome;cfg['palavras_ativacao']=[nome.lower()]
         cfg['salvar_conversas']=salvar_hist.get();cfg['painel_compartilhar_historico']=remoto_hist.get();cfg['configuracao_inicial_concluida']=True
-        salvar(BASE,cfg);messagebox.showinfo(TITULO,'Perfil salvo. Agora você pode iniciar o Neymar.');root.destroy()
+        salvar(base,cfg);messagebox.showinfo(TITULO,'Perfil salvo. O assistente será iniciado agora.');root.destroy()
     ttk.Button(corpo,text='Salvar e concluir',command=concluir).pack(anchor='e',pady=10)
     root.mainloop()
 

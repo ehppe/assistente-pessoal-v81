@@ -8,6 +8,7 @@ e ajustado separadamente. Preferências ficam em config.json (veja config.py).
 """
 import ctypes
 import queue
+import sys
 import threading
 import traceback
 from pathlib import Path
@@ -25,7 +26,7 @@ from painel_iphone import iniciar_servidor
 from ui_mixin import TRANSP, UIMixin
 from voz_mixin import VozMixin
 
-BASE = Path(__file__).resolve().parent
+BASE = Path(sys.executable).resolve().parent if getattr(sys, 'frozen', False) else Path(__file__).resolve().parent
 
 
 class Assistente(JogoMixin, RuntimeMixin, ConversaMixin, UIMixin, VozMixin, AcoesMixin, DiscordMixin, IndiceMixin):
@@ -139,7 +140,27 @@ class Assistente(JogoMixin, RuntimeMixin, ConversaMixin, UIMixin, VozMixin, Acoe
         self.root.mainloop()
 
 
-if __name__ == '__main__':
+def main():
+    # O instalador empacota tudo em um único executável. As duas opções abaixo
+    # permitem que a interface Qt e a voz continuem isoladas em subprocessos,
+    # sem exigir Python instalado no computador.
+    if '--central-process' in sys.argv:
+        from central_qt import main as central_main
+        return central_main()
+    if '--voice-process' in sys.argv:
+        from voz_processo import main_persistente
+        if '--listar' in sys.argv:
+            from voz_processo import listar_vozes
+            return listar_vozes()
+        return main_persistente()
+
+    # Na primeira abertura o próprio executável coleta o perfil. O usuário não
+    # precisa procurar outro instalador ou editar config.json.
+    inicial = config.carregar(BASE)
+    if not inicial.get('configuracao_inicial_concluida', False):
+        from configuracao_inicial import main as configurar
+        configurar(BASE)
+
     # Uma instância por sessão: evita dois ouvintes e duas respostas simultâneas.
     ctypes.windll.kernel32.CreateMutexW.restype = ctypes.c_void_p
     from versao import TITULO
@@ -152,3 +173,7 @@ if __name__ == '__main__':
             (BASE/'dados').mkdir(exist_ok=True)
             (BASE/'dados'/'inicializacao-erro.log').write_text(traceback.format_exc(), encoding='utf-8')
             ctypes.windll.user32.MessageBoxW(None, 'O Neymar não iniciou. Abra Diagnostico (ver erros).bat.', TITULO, 16)
+
+
+if __name__ == '__main__':
+    raise SystemExit(main() or 0)

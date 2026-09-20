@@ -2,6 +2,14 @@
 
 ## 81
 
+- Adicionada geração automatizada do `Neymar-Setup-v81.exe` no GitHub Actions.
+- O instalador único inclui Python, dependências, interface QML e reconhecimento Vosk.
+- Primeira configuração integrada à abertura do aplicativo empacotado.
+- Interface Qt e processo de voz continuam isolados dentro do mesmo executável.
+- Atalhos e inicialização com o Windows podem ser escolhidos durante a instalação.
+- Atualizações pelo instalador preservam configurações, dados e chaves protegidas.
+- Comandos “abra Netflix”, “abra Globo Esporte” e outros sites conhecidos agora abrem os endereços oficiais.
+- Nomes desconhecidos abrem uma pesquisa pelo site oficial em vez de falhar silenciosamente.
 - Opção para perguntar “Precisa de mais alguma coisa?” após cada resposta falada.
 - Nova escuta de continuação permite executar vários comandos em sequência sem repetir o nome.
 - Quando não entende a fala, pergunta novamente e reabre a escuta automaticamente.

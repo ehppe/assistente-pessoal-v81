@@ -87,8 +87,9 @@ class ConversaMixin(ChatVisualMixin):
         windows_pronto=False
         def listar_windows():
             try:
-                python=Path(sys.executable).with_name('python.exe') if sys.platform=='win32' else Path(sys.executable)
-                ret=subprocess.run([str(python),str(self.base/'voz_processo.py'),'--listar'],capture_output=True,timeout=15,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
+                comando=([str(Path(sys.executable).with_name('NeymarWorker.exe')),'--voice-process','--listar'] if getattr(sys,'frozen',False)
+                         else [str(Path(sys.executable).with_name('python.exe') if sys.platform=='win32' else Path(sys.executable)),str(self.base/'voz_processo.py'),'--listar'])
+                ret=subprocess.run(comando,capture_output=True,timeout=15,creationflags=getattr(subprocess,'CREATE_NO_WINDOW',0))
                 if ret.returncode:raise RuntimeError()
                 vozes=json.loads(ret.stdout.decode('utf-8'))
             except Exception:vozes=[]
